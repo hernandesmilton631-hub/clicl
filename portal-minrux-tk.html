@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINRUX TK · Red Multimedia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0B0D0F;
+    --panel:#15181C;
+    --panel-2:#1D2126;
+    --line:#2A2F35;
+    --amber:#FF6B1A;
+    --amber-dim:#7A3A15;
+    --teal:#29D9C2;
+    --paper:#F2EFE9;
+    --muted:#8B9096;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--void);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .disp{font-family:'Oswald',sans-serif;}
+
+
+  .flyer{
+    position:relative;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(ellipse at 20% -20%, rgba(255,107,26,0.18), transparent 55%),
+      radial-gradient(ellipse at 90% 120%, rgba(41,217,194,0.10), transparent 55%),
+      var(--void);
+    padding:28px 32px 22px;
+  }
+  .flyer::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+  }
+  .eyebrow{
+    display:flex; align-items:center; justify-content:space-between;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:14px;
+    position:relative; z-index:1;
+  }
+  .onair{ display:flex; align-items:center; gap:8px; color:var(--amber); font-weight:700;}
+  .onair .dot{
+    width:8px;height:8px;border-radius:50%;background:var(--amber);
+    box-shadow:0 0 0 0 rgba(255,107,26,.6);
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(255,107,26,.55);}
+    70%{box-shadow:0 0 0 9px rgba(255,107,26,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,107,26,0);}
+  }
+  .wordmark{
+    position:relative; z-index:1;
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:clamp(48px, 9vw, 104px);
+    letter-spacing:.01em;
+    line-height:.92;
+    text-transform:uppercase;
+    color:var(--paper);
+    margin:0;
+  }
+  .wordmark span{color:var(--amber);}
+  .tagline{
+    position:relative; z-index:1;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--muted);
+    margin-top:8px;
+    letter-spacing:.02em;
+  }
+  .tagline b{color:var(--teal); font-weight:600;}
+
+  .freqbar{
+    position:relative; z-index:1;
+    display:flex; align-items:flex-end; gap:3px;
+    height:26px; margin-top:20px;
+  }
+  .freqbar i{
+    display:block; width:3px; background:linear-gradient(180deg, var(--teal), var(--amber));
+    border-radius:2px 2px 0 0;
+    animation:wave 1.2s ease-in-out infinite;
+    opacity:.85;
+  }
+  @keyframes wave{
+    0%,100%{height:20%;}
+    50%{height:100%;}
+  }
+
+  
+  .tuner{
+    display:flex; gap:2px;
+    background:var(--panel);
+    padding:6px;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+  }
+  .tuner button{
+    flex:1; min-width:150px;
+    display:flex; align-items:center; gap:10px;
+    background:transparent; border:none; cursor:pointer;
+    padding:14px 18px;
+    color:var(--muted);
+    font-family:'Inter',sans-serif;
+    font-weight:600; font-size:14px;
+    border-radius:6px;
+    transition:background .15s, color .15s;
+  }
+  .tuner button .num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; color:var(--amber);
+    border:1px solid var(--amber-dim);
+    border-radius:4px; padding:2px 6px;
+  }
+  .tuner button.active{ background:var(--panel-2); color:var(--paper); }
+  .tuner button.active .num{ background:var(--amber); color:var(--void); border-color:var(--amber);}
+  .tuner button:hover{ color:var(--paper); }
+
+  main{ max-width:1080px; margin:0 auto; padding:36px 24px 80px; }
+  section{ display:none; animation:fadein .25s ease; }
+  section.active{ display:block; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  h2.section-title{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    font-size:26px;
+    letter-spacing:.03em;
+    margin:0 0 6px;
+    display:flex; align-items:center; gap:10px;
+  }
+  h2.section-title .num{ color:var(--amber); font-family:'JetBrains Mono',monospace; font-size:15px;}
+  .section-sub{ color:var(--muted); font-size:14px; margin:0 0 28px; max-width:640px; }
+
+  
+  .wiki-layout{ display:grid; grid-template-columns:200px 1fr; gap:28px; }
+  @media(max-width:720px){ .wiki-layout{ grid-template-columns:1fr; } }
+  .wiki-index{ border-right:1px solid var(--line); padding-right:20px; }
+  @media(max-width:720px){ .wiki-index{ border-right:none; border-bottom:1px solid var(--line); padding-right:0; padding-bottom:16px;} }
+  .wiki-index .letter{ font-family:'JetBrains Mono',monospace; color:var(--teal); font-size:11px; margin:14px 0 6px; letter-spacing:.1em;}
+  .wiki-index button{
+    display:block; width:100%; text-align:left;
+    background:none; border:none; color:var(--muted);
+    padding:6px 8px; font-size:14px; cursor:pointer; border-radius:4px;
+    font-family:'Inter',sans-serif;
+  }
+  .wiki-index button:hover{ background:var(--panel); color:var(--paper); }
+  .wiki-index button.active{ background:var(--amber); color:var(--void); font-weight:600; }
+  .wiki-entry{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:26px 28px; }
+  .wiki-entry .term{ font-family:'Oswald',sans-serif; font-size:28px; text-transform:uppercase; margin:0 0 2px; color:var(--paper); }
+  .wiki-entry .pos{ color:var(--teal); font-family:'JetBrains Mono',monospace; font-size:12px; margin-bottom:16px; display:block;}
+  .wiki-entry p{ line-height:1.7; color:#D8D5CE; font-size:15px; }
+  .xref{
+    background:none; border:none; padding:0; margin:0;
+    color:var(--amber); font-weight:600; cursor:pointer; text-decoration:underline;
+    text-decoration-style:dotted; font-size:inherit; font-family:inherit;
+  }
+  .xref:hover{ color:var(--teal); }
+  .see-also{ margin-top:20px; padding-top:16px; border-top:1px dashed var(--line); font-size:13px; color:var(--muted); }
+  .see-also .xref{ margin-right:6px; }
+
+  
+  .station-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+  .station{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:18px; display:flex; flex-direction:column; gap:12px;
+  }
+  .station .art{
+    height:90px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Oswald',sans-serif; font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.85);
+  }
+  .station .meta{ display:flex; justify-content:space-between; align-items:baseline; }
+  .station .name{ font-weight:600; font-size:15px; }
+  .station .genre{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+  .station .row{ display:flex; align-items:center; gap:10px; }
+  .playbtn{
+    width:40px; height:40px; border-radius:50%; border:1px solid var(--amber);
+    background:transparent; color:var(--amber); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+    flex-shrink:0; transition:background .15s,color .15s;
+  }
+  .playbtn.playing{ background:var(--amber); color:var(--void); }
+  .vu{ display:flex; align-items:flex-end; gap:2px; height:20px; flex:1; }
+  .vu i{ width:3px; background:var(--teal); border-radius:1px; opacity:.25; height:20%; }
+  .vu.on i{ animation:wave 0.9s ease-in-out infinite; opacity:.9; }
+  .vu i:nth-child(2){ animation-delay:.1s;} .vu i:nth-child(3){ animation-delay:.2s;}
+  .vu i:nth-child(4){ animation-delay:.3s;} .vu i:nth-child(5){ animation-delay:.15s;}
+  .vu i:nth-child(6){ animation-delay:.25s;} .vu i:nth-child(7){ animation-delay:.05s;}
+  .status-tag{ font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--muted); }
+  .status-tag.live{ color:var(--amber); }
+
+  
+  .tv-wrap{ display:grid; grid-template-columns:1fr 260px; gap:22px; }
+  @media(max-width:820px){ .tv-wrap{ grid-template-columns:1fr; } }
+  .monitor{
+    background:#000; border:10px solid #1c1f23; border-radius:14px;
+    position:relative; box-shadow:0 0 0 1px var(--line), 0 20px 40px rgba(0,0,0,.5);
+  }
+  .monitor .screen{ position:relative; aspect-ratio:16/9; overflow:hidden; border-radius:6px; background:#000; }
+  .monitor iframe{ width:100%; height:100%; border:0; }
+  .monitor .scan{
+    position:absolute; inset:0; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.08) 3px);
+    mix-blend-mode:multiply;
+  }
+  .monitor .barlabel{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 6px 2px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);
+  }
+  .monitor .barlabel .live{ color:var(--amber); display:flex; align-items:center; gap:6px; }
+  .monitor .barlabel .live .dot{ width:6px;height:6px;border-radius:50%; background:var(--amber); animation:pulse 1.6s infinite;}
+  .channel-list{ display:flex; flex-direction:column; gap:10px; }
+  .channel{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px; cursor:pointer; transition:border-color .15s, transform .1s;
+  }
+  .channel:hover{ border-color:var(--amber-dim); }
+  .channel.active{ border-color:var(--amber); background:var(--panel-2); }
+  .channel .chname{ font-weight:600; font-size:14px; margin-bottom:3px; }
+  .channel .chdesc{ font-size:12px; color:var(--muted); line-height:1.4; }
+  .channel .chnum{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--teal); }
+
+  footer{
+    text-align:center; padding:26px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em;
+    border-top:1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+
+<header class="flyer">
+  <div class="eyebrow">
+    <div class="onair"><span class="dot"></span> EN VIVO</div>
+    <div>MIÉ · 01 JUL 2026</div>
+    <div>88.6 MHZ</div>
+  </div>
+  <h1 class="wordmark">MINRUX<span> TK</span></h1>
+  <p class="tagline">Red Multimedia Personal — <b>Wiki</b> · <b>Radio</b> · <b>Televisión</b> en un solo portal</p>
+  <div class="freqbar" id="freqbar"></div>
+</header>
+
+<nav class="tuner">
+  <button class="active" data-target="wiki"><span class="num">CH.01</span> WIKI</button>
+  <button data-target="radio"><span class="num">CH.02</span> RADIO</button>
+  <button data-target="tv"><span class="num">CH.03</span> TELEVISIÓN</button>
+</nav>
+
+<main>
+
+  
+  <section id="wiki" class="active">
+    <h2 class="section-title"><span class="num">01</span> Wiki de Radiodifusión</h2>
+    <p class="section-sub">Diccionario de páginas interconectadas. Cada definición enlaza a otros términos relacionados — igual que una wiki real.</p>
+
+    <div class="wiki-layout">
+      <div class="wiki-index" id="wikiIndex"></div>
+      <div class="wiki-entry" id="wikiEntry"></div>
+    </div>
+  </section>
+
+  
+  <section id="radio">
+    <h2 class="section-title"><span class="num">02</span> Radio en Línea</h2>
+    <p class="section-sub">Emisoras funcionales conectadas a streams reales. Pulsa reproducir para escuchar en directo.</p>
+    <div class="station-grid" id="stationGrid"></div>
+  </section>
+
+  
+  <section id="tv">
+    <h2 class="section-title"><span class="num">03</span> Televisión en Línea</h2>
+    <p class="section-sub">Canales en directo integrados desde transmisiones públicas reales. Selecciona un canal para verlo en el monitor.</p>
+    <div class="tv-wrap">
+      <div class="monitor">
+        <div class="screen"><iframe id="tvFrame" src="" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"></iframe><div class="scan"></div></div>
+        <div class="barlabel">
+          <span id="tvNowLabel">CH.01 · NASA LIVE</span> <!-- se actualiza automáticamente al cambiar de canal -->
+          <span class="live"><span class="dot"></span> EN VIVO</span>
+        </div>
+      </div>
+      <div class="channel-list" id="channelList"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>MINRUX TK © 2026 — PORTAL MULTIMEDIA PERSONAL</footer>
+
+<script>
+
+const fb = document.getElementById('freqbar');
+for(let i=0;i<48;i++){
+  const bar = document.createElement('i');
+  bar.style.animationDelay = (Math.random()*1.2)+'s';
+  bar.style.opacity = (0.4 + Math.random()*0.6).toFixed(2);
+  fb.appendChild(bar);
+}
+
+
+document.querySelectorAll('.tuner button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tuner button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+
+
+const wiki = {
+  "transmision": {
+    term:"Transmisión", pos:"sustantivo · f.",
+    def:`Proceso de enviar una señal de audio o vídeo desde un origen hacia un receptor. Toda emisora de <x>radio</x> y todo canal de <x>television</x> dependen de una transmisión estable, medida generalmente en <x>ancho-de-banda</x> y sujeta a una <x>frecuencia</x> específica.`,
+    rel:["radio","television","ancho-de-banda","frecuencia"]
+  },
+  "frecuencia": {
+    term:"Frecuencia", pos:"sustantivo · f.",
+    def:`Número de ciclos por segundo de una onda, medido en Hz. En <x>radio</x> tradicional determina el dial (por ejemplo 88.6 MHz); en <x>streaming</x> el término se usa de forma figurada para referirse al "canal" de una emisora dentro de un <x>cms</x>.`,
+    rel:["radio","streaming","cms"]
+  },
+  "streaming": {
+    term:"Streaming", pos:"sustantivo · m.",
+    def:`Entrega continua de contenido de audio o vídeo a través de internet, sin necesidad de descargar el archivo completo. Es la tecnología detrás de la <x>radio</x> en línea y de la <x>television</x> en línea que se gestionan desde un <x>cms</x>.`,
+    rel:["radio","television","cms","codec"]
+  },
+  "cms": {
+    term:"CMS", pos:"sigla · sistema de gestión de contenido",
+    def:`Herramienta que permite crear, organizar y publicar contenido sin escribir código desde cero. En este portal, el CMS es lo que permite diseñar emisoras de <x>radio</x>, programar canales de <x>television</x> y mantener la <x>wiki</x> actualizada.`,
+    rel:["radio","television","wiki","podcast"]
+  },
+  "wiki": {
+    term:"Wiki", pos:"sustantivo · f.",
+    def:`Sitio web compuesto por páginas interconectadas que los usuarios pueden enlazar entre sí, como un diccionario vivo. Cada entrada de esta página es un ejemplo: define un término y enlaza a los relacionados mediante <x>transmision</x> cruzada de referencias.`,
+    rel:["transmision","cms"]
+  },
+  "podcast": {
+    term:"Podcast", pos:"sustantivo · m.",
+    def:`Programa de audio distribuido en episodios descargables o en <x>streaming</x>, normalmente organizado por un <x>cms</x> y publicado dentro de una programación similar a la de una <x>radio</x> tradicional.`,
+    rel:["streaming","cms","radio"]
+  },
+  "ancho-de-banda": {
+    term:"Ancho de Banda", pos:"sustantivo · m.",
+    def:`Cantidad de datos que puede transportarse por segundo en una <x>transmision</x>. Un ancho de banda insuficiente provoca cortes en el <x>streaming</x> de audio o vídeo, afectando tanto a la <x>radio</x> como a la <x>television</x> en línea.`,
+    rel:["transmision","streaming","radio","television"]
+  },
+  "codec": {
+    term:"Codec", pos:"sustantivo · m.",
+    def:`Algoritmo que comprime y descomprime audio o vídeo para que pueda enviarse eficientemente por <x>streaming</x>. La calidad de una emisora de <x>radio</x> o de un canal de <x>television</x> depende directamente del codec elegido.`,
+    rel:["streaming","radio","television"]
+  },
+  "on-air": {
+    term:"On Air", pos:"expresión · en directo",
+    def:`Indicador que señala que una <x>radio</x> o <x>television</x> está transmitiendo en vivo en ese momento, sin grabación previa. El indicador luminoso del encabezado de este portal representa precisamente ese estado.`,
+    rel:["radio","television"]
+  },
+  "television": {
+    term:"Televisión", pos:"sustantivo · f.",
+    def:`Medio que transmite imagen y sonido en movimiento. En su versión en línea, un canal de televisión se construye dentro de un <x>cms</x>, integrando vídeos y redes sociales, y gestionando la <x>transmision</x> igual que una emisora de <x>radio</x>.`,
+    rel:["cms","transmision","radio","on-air"]
+  },
+  "radio": {
+    term:"Radio", pos:"sustantivo · f.",
+    def:`Medio de comunicación basado en la transmisión de audio. Una radio en línea se diseña y configura dentro de un <x>cms</x>, apoyándose en herramientas de <x>streaming</x> para llegar a los oyentes con una <x>frecuencia</x> constante.`,
+    rel:["cms","streaming","frecuencia","podcast"]
+  }
+};
+
+function renderIndex(activeKey){
+  const idx = document.getElementById('wikiIndex');
+  idx.innerHTML = '';
+  const keys = Object.keys(wiki).sort((a,b)=>wiki[a].term.localeCompare(wiki[b].term));
+  const label = document.createElement('div');
+  label.className='letter';
+  label.textContent = 'ÍNDICE A–Z';
+  idx.appendChild(label);
+  keys.forEach(k=>{
+    const b = document.createElement('button');
+    b.textContent = wiki[k].term;
+    if(k===activeKey) b.classList.add('active');
+    b.addEventListener('click', ()=>openWikiTerm(k));
+    idx.appendChild(b);
+  });
+}
+
+function openWikiTerm(key){
+  const data = wiki[key];
+  if(!data) return;
+  const entry = document.getElementById('wikiEntry');
+  let defHtml = data.def.replace(/<x>(.*?)<\/x>/g, (m, txt)=>{
+    const slug = txt.toLowerCase();
+    return `<button class="xref" data-key="${slug}">${txt}</button>`;
+  });
+  entry.innerHTML = `
+    <div class="term">${data.term}</div>
+    <span class="pos">${data.pos}</span>
+    <p>${defHtml}</p>
+    <div class="see-also">Ver también: ${data.rel.map(r=>`<button class="xref" data-key="${r}">${wiki[r].term}</button>`).join(' ')}</div>
+  `;
+  entry.querySelectorAll('.xref').forEach(x=>{
+    x.addEventListener('click', ()=> openWikiTerm(x.dataset.key));
+  });
+  renderIndex(key);
+}
+openWikiTerm('radio');
+
+
+const stations = [
+  {name:"Groove Salad", genre:"Downtempo / Chill", color:"linear-gradient(135deg,#2c3e50,#4ca1af)", url:"https://ice1.somafm.com/groovesalad-128-mp3"},
+  {name:"Drone Zone", genre:"Ambient Espacial", color:"linear-gradient(135deg,#141e30,#243b55)", url:"https://ice1.somafm.com/dronezone-128-mp3"},
+  {name:"Beat Blender", genre:"Deep House", color:"linear-gradient(135deg,#5f2c82,#49a09d)", url:"https://ice1.somafm.com/beatblender-128-mp3"},
+  {name:"Indie Pop Rocks", genre:"Indie Pop", color:"linear-gradient(135deg,#ff6a00,#ee0979)", url:"https://ice1.somafm.com/indiepop-128-mp3"},
+  {name:"Lush", genre:"Vocal Chillout", color:"linear-gradient(135deg,#833ab4,#fd1d1d)", url:"https://ice1.somafm.com/lush-128-mp3"},
+];
+
+let currentAudio = null;
+let currentBtn = null;
+let currentVu = null;
+
+const grid = document.getElementById('stationGrid');
+stations.forEach((s, i)=>{
+  const card = document.createElement('div');
+  card.className = 'station';
+  card.innerHTML = `
+    <div class="art" style="background:${s.color}">${s.name.toUpperCase()}</div>
+    <div class="meta">
+      <div>
+        <div class="name">${s.name}</div>
+        <div class="genre">${s.genre}</div>
+      </div>
+      <div class="status-tag" id="tag-${i}">— OFF —</div>
+    </div>
+    <div class="row">
+      <button class="playbtn" id="btn-${i}" aria-label="Reproducir ${s.name}">▶</button>
+      <div class="vu" id="vu-${i}">${Array.from({length:7}).map(()=>'<i></i>').join('')}</div>
+    </div>
+  `;
+  grid.appendChild(card);
+});
+
+grid.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.playbtn');
+  if(!btn) return;
+  const idx = btn.id.split('-')[1];
+  const s = stations[idx];
+  const tag = document.getElementById('tag-'+idx);
+  const vu = document.getElementById('vu-'+idx);
+
+
+  if(currentAudio){
+    currentAudio.pause();
+    if(currentBtn){ currentBtn.classList.remove('playing'); currentBtn.textContent = '▶'; }
+    if(currentVu){ currentVu.classList.remove('on'); }
+    const oldIdx = currentBtn ? currentBtn.id.split('-')[1] : null;
+    if(oldIdx !== null){ document.getElementById('tag-'+oldIdx).textContent = '— OFF —'; document.getElementById('tag-'+oldIdx).classList.remove('live'); }
+    const wasSame = currentBtn === btn;
+    currentAudio = null; currentBtn = null; currentVu = null;
+    if(wasSame){ return; }
+  }
+
+  const audio = new Audio(s.url);
+  audio.crossOrigin = "anonymous";
+  audio.play().then(()=>{
+    btn.classList.add('playing'); btn.textContent = '❚❚';
+    vu.classList.add('on');
+    tag.textContent = 'EN VIVO'; tag.classList.add('live');
+    currentAudio = audio; currentBtn = btn; currentVu = vu;
+  }).catch(()=>{
+    tag.textContent = 'ERROR DE SEÑAL';
+  });
+});
+
+// Nota: se usa el formato "embed/live_stream?channel=ID" (en vez de un video suelto)
+// porque apunta siempre a lo que ese canal esté transmitiendo EN VIVO en este momento,
+// y el reproductor queda incrustado dentro del monitor del portal — nunca navega afuera.
+const YT_PARAMS = "autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1";
+
+const channels = [
+  {
+    name: "NASA Live",
+    num: "CH.01",
+    desc: "Transmisión oficial de la NASA — misiones, lanzamientos y vistas de la ISS.",
+    embed: `https://www.youtube.com/embed/live_stream?channel=UCLA_DiR1FfKNvjuUpBHmylQ&${YT_PARAMS}`
+  },
+  {
+    name: "DW News",
+    num: "CH.02",
+    desc: "Noticiero internacional 24/7.",
+    embed: `https://www.youtube.com/embed/live_stream?channel=UCknLrEdhRCp1aegoMqRaCZg&${YT_PARAMS}`
+  },
+  {
+    name: "France 24",
+    num: "CH.03",
+    desc: "Actualidad internacional en directo desde París.",
+    embed: `https://www.youtube.com/embed/live_stream?channel=UCQfwfsi5VrQ8yKZ-UWmAEFg&${YT_PARAMS}`
+  },
+  {
+    name: "Al Jazeera English",
+    num: "CH.04",
+    desc: "Cobertura global en vivo desde Doha.",
+    embed: `https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqNL5ZzHSJj3l8Bg&${YT_PARAMS}`
+  },
+  {
+    name: "Euronews Español",
+    num: "CH.05",
+    desc: "Noticias europeas en vivo, en español.",
+    embed: `https://www.youtube.com/embed/live_stream?channel=UCyoGb3SMlTlB8CLGVH4c8Rw&${YT_PARAMS}`
+  }
+];
+
+const chList = document.getElementById('channelList');
+const tvFrame = document.getElementById('tvFrame');
+const tvNowLabel = document.getElementById('tvNowLabel');
+
+function loadChannel(i){
+  const c = channels[i];
+  // Se asigna el src del iframe que ya vive dentro del monitor del portal:
+  // el usuario nunca es redirigido a youtube.com ni a ninguna otra página.
+  tvFrame.src = c.embed;
+  tvNowLabel.textContent = `${c.num} · ${c.name.toUpperCase()}`;
+  document.querySelectorAll('.channel').forEach((el,idx)=> el.classList.toggle('active', idx===i));
+}
+
+channels.forEach((c,i)=>{
+  const el = document.createElement('div');
+  el.className = 'channel' + (i===0 ? ' active' : '');
+  el.innerHTML = `
+    <div class="chnum">${c.num}</div>
+    <div class="chname">${c.name}</div>
+    <div class="chdesc">${c.desc}</div>
+  `;
+  el.addEventListener('click', ()=> loadChannel(i));
+  chList.appendChild(el);
+});
+loadChannel(0);
+</script>
+</body>
+</html>
